@@ -1,8 +1,6 @@
-import './App.css'
 import axios from 'axios'
 
-
-function parseJson() {
+const Request = () => {
   axios
     .get('http://localhost:3001/fetch-xml')
     .then(response => {
@@ -19,18 +17,8 @@ function parseJson() {
     })
     .catch(error => console.error(error))
 
-  return (
-    <></>
-  )
+  return response.data
 
 }
 
-
-function App() {
-
-  return (
-    parseJson()
-  )
-}
-
-export default App
+export default Request
