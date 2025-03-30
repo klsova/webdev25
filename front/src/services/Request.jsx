@@ -1,5 +1,14 @@
 import axios from 'axios'
 
+/*
+Returns an object with the following values:
+temperature:
+windSpeedMS:
+windDirection:
+rain:
+symbol:
+*/
+
 const Request = () => {
   axios
     .get('http://localhost:3001/fetch-xml')
@@ -14,10 +23,12 @@ const Request = () => {
 
       console.log(weather)
 
+      return (weather)
+
     })
     .catch(error => console.error(error))
 
-  return response.data
+  return (<></>)
 
 }
 
