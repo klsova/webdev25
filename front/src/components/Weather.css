@@ -7,6 +7,9 @@
     width: 60vh;
     padding: 50px;
     background-color: lightblue;
+    border-radius: 12px;
+    margin-top: 150px;
+    margin-bottom: 50px;
 }
 
 .day1, .day2, .day3, .day4, .day5, .day6, .day7 {
