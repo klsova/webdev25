@@ -1,15 +1,60 @@
 const express = require('express')
 const axios = require('axios')
 const xml2js = require('xml2js')
+const mongoose = require('mongoose')
 const app = express()
 const cors = require('cors')
+require("dotenv").config()
 
 app.use(cors())
+app.use(express.json())
+
+const Commentschema = new mongoose.Schema(
+    {
+        name: { type: String, required: true },
+        comment: { type: String, required: true }
+
+    }
+);
+
+const Comment = mongoose.model("Comment", Commentschema)
+
+mongoose
+    .connect(process.env.MONGO_URI)
+    .then(() => console.log("MongoDB connected"))
+    .catch((err) => console.log(err))
 
 
-app.get('/', (request, response) => {
-  response.send('<h1>Hello World!</h1>')
-})
+app.get("/comments/", async (req, res) => {
+    try {
+        const comments = await Comment.find().sort({ createdAt: -1 });
+        res.json(comments);
+    } catch (error) {
+        console.error(error);
+    }
+});
+
+app.post("/comments/", async (req, res) => {
+    try {
+        const { ID, name, comment } = req.body;
+        const newComment = new Comment({ ID, name, comment})
+        await newComment.save();
+        res.json(newComment);
+    } catch (error) {
+        console.error(error);
+    }
+});
+
+app.delete("/comments/:id", async (req, res) => {
+    try {
+        const comment = await Comment.findByIdAndDelete(req.params.id);
+        res.json({ message: "Comment deleted" });
+    }
+    catch (error) {
+        console.error(error);
+    }
+}
+);
 
 app.get('/fetch-xml', async (request, response) => {
   try {
