@@ -37,8 +37,7 @@ app.get("/comments/", async (req, res) => {
 app.post("/comments/", async (req, res) => {
     try {
         const { ID, name, comment } = req.body;
-        const newComment = new Comment({ ID, name, comment})
-        await newComment.save();
+        const newComment = new Comment({ ID, name, comment});
         res.json(newComment);
     } catch (error) {
         console.error(error);
@@ -49,6 +48,7 @@ app.delete("/comments/:id", async (req, res) => {
     try {
         const comment = await Comment.findByIdAndDelete(req.params.id);
         res.json({ message: "Comment deleted" });
+        await comment.remove()
     }
     catch (error) {
         console.error(error);
@@ -67,11 +67,16 @@ app.get('/fetch-xml', async (request, response) => {
 })
 
 async function fetchXML() {
-  const now = new Date().toISOString()
+  const now = new Date()
   const next = new Date()
-  next.setHours(next.getHours() + 1,0,0,0)
 
-  const apiUrl = `https://opendata.fmi.fi/wfs?service=WFS&version=2.0.0&request=getFeature&storedquery_id=fmi::forecast::meps::surface::point::simple&place=turku&starttime=${now}&endtime=${next.toISOString()}&parameters=Temperature,WindspeedMS,WindDirection,PrecipitationAmount,WeatherSymbol3`
+  const nowUTC = new Date(now.getTime() + 3 * 60 * 60 * 1000);
+  const nextUTC = new Date(next.getTime() + 3 * 60 * 60 * 1000);
+  nextUTC.setHours(nextUTC.getHours() + 1,0,0,0)
+
+  const nowISO = nowUTC.toISOString()
+
+  const apiUrl = `https://opendata.fmi.fi/wfs?service=WFS&version=2.0.0&request=getFeature&storedquery_id=fmi::forecast::meps::surface::point::simple&place=turku&starttime=${nowISO}&endtime=${nextUTC.toISOString()}&parameters=Temperature,WindspeedMS,WindDirection,PrecipitationAmount,WeatherSymbol3`
 
   try {
     const response = await axios.get(apiUrl, {
