@@ -1,4 +1,4 @@
-.weather-box {
+.weather-container {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -12,10 +12,8 @@
     margin-bottom: 50px;
 }
 
-.day1, .day2, .day3, .day4, .day5, .day6, .day7 {
-    text-align: left;
-    text-transform: uppercase;
-    line-height: 5;
-    font-weight: 700;
-    font-size: 1.2em;
+.WeatherIcon {
+    width: 100px;
+    height: 100px;
 }
+
