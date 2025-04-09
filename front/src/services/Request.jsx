@@ -9,27 +9,61 @@ rain:
 symbol:
 */
 
-const Request = () => {
-  axios
-    .get('http://localhost:3001/fetch-xml')
-    .then(response => {
-      const weather = {
-        temperature: response.data["wfs:FeatureCollection"]["wfs:member"]["0"]["BsWfs:BsWfsElement"]["BsWfs:ParameterValue"],
-        windSpeedMS: response.data["wfs:FeatureCollection"]["wfs:member"]["1"]["BsWfs:BsWfsElement"]["BsWfs:ParameterValue"],
-        windDirection: response.data["wfs:FeatureCollection"]["wfs:member"]["2"]["BsWfs:BsWfsElement"]["BsWfs:ParameterValue"],
-        rain: response.data["wfs:FeatureCollection"]["wfs:member"]["3"]["BsWfs:BsWfsElement"]["BsWfs:ParameterValue"],
-        symbol: response.data["wfs:FeatureCollection"]["wfs:member"]["4"]["BsWfs:BsWfsElement"]["BsWfs:ParameterValue"]
-      }
+const requestWeatherData = async () => {
+  try {
+    const response = await axios.get('http://localhost:3001/fetch-xml')
+    const parts = response.data["wfs:FeatureCollection"]["wfs:member"]
 
-      console.log(weather)
+    const weather = {
+      temperature: null,
+      windSpeedMS: null,
+      windDirection: null,
+      rain: null,
+      symbol: null,
+      time: null,
+      location: null
+    };
+  
 
-      return (weather)
 
-    })
-    .catch(error => console.error(error))
+    parts.forEach(part => {
+      const element = part["BsWfs:BsWfsElement"]
+      const parameterName = element["BsWfs:ParameterName"]
+      const parameterValue = parseFloat(element["BsWfs:ParameterValue"])
+      
+    if (!weather.time) {
+      weather.time = element["BsWfs: Time"]
+      const [lat, lon] = element["BsWfs:Location"]["gml:Point"]["gml:pos"].trim().split('')
+      weather.location = {
+        lat: parseFloat(lat),
+        lon: parseFloat(lon)
+      };
+    }
 
-  return (<></>)
+    switch(parameterName) {
+      case 'Temperature':
+        weather.temperature = parameterValue;
+        break;
+      case 'WindspeedMS':
+        weather.windSpeedMS = parameterValue;
+        break;
+      case 'WindDirection':
+        weather.windDirection = parameterValue;
+        break;
+      case 'PrecipitationAmount':
+        weather.rain = parameterValue;
+        break;
+      case 'WeatherSymbol3':
+        weather.symbol = parameterValue;
+        break;
+    }
+  });
 
+  return weather;
+} catch (error) {
+  console.error('Error fetching weather data:', error);
+  throw error;
 }
+};
 
-export default Request
+export default requestWeatherData;
