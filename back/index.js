@@ -1,10 +1,11 @@
+require('dotenv').config()
 const express = require('express')
 const axios = require('axios')
 const xml2js = require('xml2js')
 const mongoose = require('mongoose')
 const app = express()
 const cors = require('cors')
-require("dotenv").config()
+
 
 app.use(cors())
 app.use(express.json())
@@ -14,7 +15,8 @@ const Commentschema = new mongoose.Schema(
         name: { type: String, required: true },
         comment: { type: String, required: true }
 
-    }
+    },
+    { timestamps: true }
 );
 
 const Comment = mongoose.model("Comment", Commentschema)
@@ -38,6 +40,7 @@ app.post("/comments/", async (req, res) => {
     try {
         const { ID, name, comment } = req.body;
         const newComment = new Comment({ ID, name, comment});
+        await newComment.save()
         res.json(newComment);
     } catch (error) {
         console.error(error);
